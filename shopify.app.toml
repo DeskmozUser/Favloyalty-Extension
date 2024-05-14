@@ -1,0 +1,21 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "a0e07c246a9ad009d7bd7e08118bda65"
+name = "loyli"
+handle = "loyli"
+application_url = "https://shopify.favseo.com/fav_loyalty/loyalty_node/install"
+embedded = true
+
+[build]
+dev_store_url = "devloyality.myshopify.com"
+
+[auth]
+redirect_urls = [
+  "https://shopify.favseo.com/fav_loyalty/loyalty_next/add-point-setting"
+]
+
+[webhooks]
+api_version = "2023-10"
+
+[pos]
+embedded = false
