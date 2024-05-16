@@ -1,0 +1,23 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "e5aa02fe2f29c0d1cd005634f5ce3ad4"
+name = "loyli"
+handle = "loyli-1"
+application_url = "https://f08c-122-160-14-226.ngrok-free.app/install"
+embedded = false
+
+[build]
+dev_store_url = "quickstart-cc2f98f1.myshopify.com"
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = ""
+
+[auth]
+redirect_urls = [ "https://shopify.favseo.com/add-point-setting" ]
+
+[webhooks]
+api_version = "2024-04"
+
+[pos]
+embedded = false
