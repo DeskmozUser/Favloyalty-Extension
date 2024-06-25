@@ -1,114 +1,124 @@
 <script>
+ window.localStorage.setItem("hello","sethello")
+ console.log(window.localStorage)
   function wd() {
     var t = document.createElement('iframe');
-    // let url='https://shopify.favseo.com/fav_loyalty/widget'
     let url = 'https://shopify.favseo.com';
+   
 
-    t.setAttribute('style', 'position: fixed; bottom: 10px; right: 0; width: 420px; height: 700px; border: none;'),
-      t.setAttribute('src', `${url}?shop={{ shop.url | url_encode }}`),
-      t.setAttribute('allow', 'clipboard-write');
-      // t.setAttribute('src', 'http://localhost:3000'),
-      // https://light-berries-yell.loca.lt/
-      document.body.appendChild(t);
+    t.setAttribute('style', 'position: fixed; bottom: 10px; right: 0; width: 420px; height: 750px; border: none;');
+    t.setAttribute('src', `${url}?shop={{ shop.url | url_encode }}`);
+    t.setAttribute('allow', 'clipboard-write');
+
+    document.body.appendChild(t);
   }
-
+ 
   wd();
+</script>
+<script>
+  window.localStorage.setItem("hello","sethello2")
+     if(window!=undefined){
+  const queryStringKeyValue =window.location.search.replace("?", "").split("&");
+          const qsJsonObject: any = {};
+          if (queryStringKeyValue != "") {
+            for (let i = 0; i < queryStringKeyValue.length; i++) {
+              qsJsonObject[queryStringKeyValue[i].split("=")[0]] =
+                queryStringKeyValue[i].split("=")[1];
+            }
+          }
+          if(qsJsonObject){
+            window.localStorage.setItem("fav_loyalty_refferal_code",qsJsonObject.referral_code)
+          }
+ }
 </script>
 
 <script>
+
   window.addEventListener('message', (event) => {
+    window.localStorage.setItem("hello","sethello3")
     if (event.origin === 'https://shopify.favseo.com') {
       if (event.data.type === 'REQUEST_LOCAL_STORAGE') {
         const localStorageData = JSON.stringify(localStorage);
         event.source.postMessage({ type: 'LOCAL_STORAGE_DATA', payload: localStorageData }, event.origin);
-      }
-      else if (event.data.type === 'SET_LOCAL_STORAGE') {
+      } else if (event.data.type === 'SET_LOCAL_STORAGE') {
         const { key, value } = event.data.payload;
-        // console.log(key, value)
         localStorage.setItem(key, value);
-      }
-      else if (event.data.type === "REQUEST_FAVLOYALTY_DATA") {
-
-      let customer_data = null
+      } else if (event.data.type === 'GET_QUERY_PARAMS') {
+        event.source.postMessage({
+          type: 'QUERY_PARAMS',
+          queryParams: window.location.search
+        }, event.origin);
+      } else if (event.data.type === 'REQUEST_FAVLOYALTY_DATA') {
+        let customer_data = null;
+        console.log( {{ customer.total_spent }})
         {% if customer != nil %}
-        customer_data = {
-          id:{{ customer.id }},
-          email: '{{- customer.email -}}',
-          firstName: '{{- customer.first_name -}}',
-          lastName: '{{- customer.last_name -}}',
-          shop: '{{- shop.secure_url -}}',
-          acceptsMarketing: {{ customer.accepts_marketing }},
-          ordersCount: {{ customer.orders_count }},
-          totalSpent: {{ customer.total_spent }},
-
-    },
-
-    {% endif %}
-        event.source.postMessage({ type: 'REQUEST_FAVLOYALTY_DATA', payload: { shop: '{{- shop.secure_url -}}',customer:customer_data} }, event.origin);
-      }
-      else if (event.data.type === "REQUEST_CUSTOMER_DATA") {
-        let customer_data = null
+          customer_data = {
+            id: {{ customer.id }},
+            email: '{{ customer.email }}',
+            firstName: '{{ customer.first_name }}',
+            lastName: '{{ customer.last_name }}',
+            shop: '{{ shop.secure_url }}',
+            acceptsMarketing: {{ customer.accepts_marketing }},
+            ordersCount: {{ customer.orders_count }},
+            totalSpent: {{ customer.total_spent }},
+            cartToken:window.localStorage.getItem("cartToken")
+          };
+        {% endif %}
+        event.source.postMessage({ type: 'REQUEST_FAVLOYALTY_DATA', payload: { shop: '{{ shop.secure_url }}', customer: customer_data } }, event.origin);
+      } else if (event.data.type === 'REQUEST_CUSTOMER_DATA') {
+        let customer_data = null;
         {% if customer != nil %}
-        customer_data = {
-          id:{{ customer.id }},
-          email: '{{- customer.email -}}',
-          firstName: '{{- customer.first_name -}}',
-          lastName: '{{- customer.last_name -}}',
-          shop: '{{- shop.secure_url -}}',
-          acceptsMarketing: {{ customer.accepts_marketing }},
-          ordersCount: {{ customer.orders_count }},
-          totalSpent: {{ customer.total_spent }},
-
-    },
-
-
-
-    {% endif %}
-
-    event.source.postMessage({
-      type: "REQUEST_CUSTOMER_DATA", payload: customer_data
-    }, event.origin)
-  }
-  }
+          customer_data = {
+            id: {{ customer.id }},
+            email: '{{ customer.email }}',
+            firstName: '{{ customer.first_name }}',
+            lastName: '{{ customer.last_name }}',
+            shop: '{{ shop.secure_url }}',
+            acceptsMarketing: {{ customer.accepts_marketing }},
+            ordersCount: {{ customer.orders_count }},
+            totalSpent: {{ customer.total_spent }},
+            cartToken:window.localStorage.getItem("cartToken")
+          };
+        {% endif %}
+        event.source.postMessage({ type: 'REQUEST_CUSTOMER_DATA', payload: customer_data }, event.origin);
+      }
+    }
   });
 </script>
 
-<script>
+{% comment %} <script>
   let loginWebhook = false;
   {% if customer != nil %}
-  if (!window.localStorage.getItem('logged')) {
-    loginWebhook = true;
-  }
+    if (!window.localStorage.getItem('logged')) {
+      loginWebhook = true;
+    }
   {% else %}
-  window.localStorage.removeItem('logged')
+    window.localStorage.removeItem('logged');
   {% endif %}
-</script>
+</script> {% endcomment %}
 
-<script>
+{% comment %} <script>
   if (loginWebhook) {
     window.localStorage.setItem('logged', JSON.stringify({ logged: true, customer: null }));
-    console.log('CALL endpoint of webhook', '{{- customer.email -}}');
-    // Make a fetch request here and call the webhook endpoint
-    // Manually call webhook
-    //  let backendurl='https://shopify.favseo.com/fav_loyalty/loyalty_node'
+    console.log('CALL endpoint of webhook', '{{ customer.email }}');
     var backendurl = 'http://localhost:4000';
-
     const webhookURL = `${backendurl}/api/revalidate/login`;
     const webhookData = {
-      email: '{{- customer.email -}}',
-      first_name: '{{- customer.first_name -}}',
-      last_name: '{{- customer.last_name -}}',
-      shop: '{{- shop.secure_url -}}',
+      email: '{{ customer.email }}',
+      first_name: '{{ customer.first_name }}',
+      last_name: '{{ customer.last_name }}',
+      shop: '{{ shop.secure_url }}',
     };
     fetch(webhookURL, {
-      method: 'POST', // *GET, POST, PUT, DELETE, etc.
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(webhookData),
     });
   }
-</script>
+</script> {% endcomment %}
+
 
 {% schema %}
 {
