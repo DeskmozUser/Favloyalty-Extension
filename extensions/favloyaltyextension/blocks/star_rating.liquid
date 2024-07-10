@@ -1,5 +1,5 @@
 <script>
- window.localStorage.setItem("hello","sethello")
+ {% comment %} window.localStorage.setItem("hello","sethello") {% endcomment %}
  console.log(window.localStorage)
   function wd() {
     var t = document.createElement('iframe');
@@ -16,10 +16,10 @@
   wd();
 </script>
 <script>
-  window.localStorage.setItem("hello","sethello2")
+  {% comment %} window.localStorage.setItem("hello","sethello2") {% endcomment %}
      if(window!=undefined){
   const queryStringKeyValue =window.location.search.replace("?", "").split("&");
-          const qsJsonObject: any = {};
+          const qsJsonObject = {};
           if (queryStringKeyValue != "") {
             for (let i = 0; i < queryStringKeyValue.length; i++) {
               qsJsonObject[queryStringKeyValue[i].split("=")[0]] =
@@ -35,7 +35,36 @@
 <script>
 
   window.addEventListener('message', (event) => {
-    window.localStorage.setItem("hello","sethello3")
+    {% comment %} window.localStorage.setItem("hello","sethello3") {% endcomment %}
+
+    function getCookie(name) {
+      let cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+          let cookie = cookies[i].trim();
+          // Check if this cookie string begins with the name we want
+          if (cookie.indexOf(name + '=') === 0) {
+              return cookie.substring(name.length + 1, cookie.length);
+          }
+      }
+      return null;
+  }
+  
+  // Function to get the value before the question mark
+  function getValueBeforeQuestionMark(cookieValue) {
+      if (cookieValue) {
+          // Decode the URL-encoded cookie value
+          let decodedValue = decodeURIComponent(cookieValue);
+          // Extract the part before the question mark
+          return decodedValue.split('?')[0];
+      }
+      return null;
+  }
+  
+  // Example usage:
+  let cookieName = 'cart'; // Replace with your actual cookie name
+  let cookieValue = getCookie(cookieName);
+  let valueBeforeQuestionMark = getValueBeforeQuestionMark(cookieValue).replace(/^"(.*)"$/, '$1');;
+  console.log(valueBeforeQuestionMark,window.localStorage.getItem("cartToken"))
     if (event.origin === 'https://shopify.favseo.com') {
       if (event.data.type === 'REQUEST_LOCAL_STORAGE') {
         const localStorageData = JSON.stringify(localStorage);
@@ -61,7 +90,7 @@
             acceptsMarketing: {{ customer.accepts_marketing }},
             ordersCount: {{ customer.orders_count }},
             totalSpent: {{ customer.total_spent }},
-            cartToken:window.localStorage.getItem("cartToken")
+            cartToken:window.localStorage.getItem("cartToken")?window.localStorage.getItem("cartToken").replace(/^"(.*)"$/, '$1'):valueBeforeQuestionMark
           };
         {% endif %}
         event.source.postMessage({ type: 'REQUEST_FAVLOYALTY_DATA', payload: { shop: '{{ shop.secure_url }}', customer: customer_data } }, event.origin);
@@ -77,7 +106,7 @@
             acceptsMarketing: {{ customer.accepts_marketing }},
             ordersCount: {{ customer.orders_count }},
             totalSpent: {{ customer.total_spent }},
-            cartToken:window.localStorage.getItem("cartToken")
+            cartToken:window.localStorage.getItem("cartToken")?window.localStorage.getItem("cartToken").replace(/^"(.*)"$/, '$1'):valueBeforeQuestionMark
           };
         {% endif %}
         event.source.postMessage({ type: 'REQUEST_CUSTOMER_DATA', payload: customer_data }, event.origin);
