@@ -8,7 +8,6 @@ embedded = true
 
 [build]
 dev_store_url = "test-store20240.myshopify.com"
-include_config_on_deploy = true
 
 [auth]
 redirect_urls = [ "https://shopify.favseo.com/get-token" ]

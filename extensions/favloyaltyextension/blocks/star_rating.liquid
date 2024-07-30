@@ -16,24 +16,23 @@
   wd();
 </script>
 <script>
-  {% comment %} window.localStorage.setItem("hello","sethello2") {% endcomment %}
-     if(window!=undefined){
-  const queryStringKeyValue =window.location.search.replace("?", "").split("&");
-          const qsJsonObject = {};
-          if (queryStringKeyValue != "") {
-            for (let i = 0; i < queryStringKeyValue.length; i++) {
-              qsJsonObject[queryStringKeyValue[i].split("=")[0]] =
-                queryStringKeyValue[i].split("=")[1];
-            }
-          }
-          if(qsJsonObject){
-            window.localStorage.setItem("fav_loyalty_refferal_code",qsJsonObject.referral_code)
-          }
- }
+   {% comment %} window.localStorage.setItem("hello","sethello2") {% endcomment %}
+      if(window!=undefined){
+   const queryStringKeyValue =window.location.search.replace("?", "").split("&");
+           const qsJsonObject = {};
+           if (queryStringKeyValue != "") {
+             for (let i = 0; i < queryStringKeyValue.length; i++) {
+               qsJsonObject[queryStringKeyValue[i].split("=")[0]] =
+                 queryStringKeyValue[i].split("=")[1];
+             }
+           }
+           if(qsJsonObject){
+             window.localStorage.setItem("fav_loyalty_refferal_code",qsJsonObject.referral_code)
+           }
+  }
 </script>
 
 <script>
-
   window.addEventListener('message', (event) => {
     {% comment %} window.localStorage.setItem("hello","sethello3") {% endcomment %}
 
@@ -48,7 +47,7 @@
       }
       return null;
   }
-  
+
   // Function to get the value before the question mark
   function getValueBeforeQuestionMark(cookieValue) {
       if (cookieValue) {
@@ -59,11 +58,14 @@
       }
       return null;
   }
-  
+
   // Example usage:
   let cookieName = 'cart'; // Replace with your actual cookie name
   let cookieValue = getCookie(cookieName);
-  let valueBeforeQuestionMark = getValueBeforeQuestionMark(cookieValue).replace(/^"(.*)"$/, '$1');;
+  let valueBeforeQuestionMark = getValueBeforeQuestionMark(cookieValue);
+  if(valueBeforeQuestionMark){
+    valueBeforeQuestionMark=valueBeforeQuestionMark.replace(/^"(.*)"$/, '$1');
+  }
   console.log(valueBeforeQuestionMark,window.localStorage.getItem("cartToken"))
     if (event.origin === 'https://shopify.favseo.com') {
       if (event.data.type === 'REQUEST_LOCAL_STORAGE') {
@@ -115,39 +117,42 @@
   });
 </script>
 
-{% comment %} <script>
-  let loginWebhook = false;
-  {% if customer != nil %}
-    if (!window.localStorage.getItem('logged')) {
-      loginWebhook = true;
+{% comment %}
+  <script>
+    let loginWebhook = false;
+    {% if customer != nil %}
+      if (!window.localStorage.getItem('logged')) {
+        loginWebhook = true;
+      }
+    {% else %}
+      window.localStorage.removeItem('logged');
+    {% endif %}
+  </script>
+{% endcomment %}
+
+{% comment %}
+  <script>
+    if (loginWebhook) {
+      window.localStorage.setItem('logged', JSON.stringify({ logged: true, customer: null }));
+      console.log('CALL endpoint of webhook', '{{ customer.email }}');
+      var backendurl = 'http://localhost:4000';
+      const webhookURL = `${backendurl}/api/revalidate/login`;
+      const webhookData = {
+        email: '{{ customer.email }}',
+        first_name: '{{ customer.first_name }}',
+        last_name: '{{ customer.last_name }}',
+        shop: '{{ shop.secure_url }}',
+      };
+      fetch(webhookURL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(webhookData),
+      });
     }
-  {% else %}
-    window.localStorage.removeItem('logged');
-  {% endif %}
-</script> {% endcomment %}
-
-{% comment %} <script>
-  if (loginWebhook) {
-    window.localStorage.setItem('logged', JSON.stringify({ logged: true, customer: null }));
-    console.log('CALL endpoint of webhook', '{{ customer.email }}');
-    var backendurl = 'http://localhost:4000';
-    const webhookURL = `${backendurl}/api/revalidate/login`;
-    const webhookData = {
-      email: '{{ customer.email }}',
-      first_name: '{{ customer.first_name }}',
-      last_name: '{{ customer.last_name }}',
-      shop: '{{ shop.secure_url }}',
-    };
-    fetch(webhookURL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(webhookData),
-    });
-  }
-</script> {% endcomment %}
-
+  </script>
+{% endcomment %}
 
 {% schema %}
 {
